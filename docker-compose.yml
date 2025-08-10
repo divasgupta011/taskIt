@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: taskit-redis
+    ports:
+      - "6379:6379"
+
+  task-api:
+    build:
+      context: ./api
+    container_name: taskit-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_ADDR=redis:6379
+
+  task-worker:
+    build:
+      context: ./worker
+    container_name: taskit-worker
+    depends_on:
+      - redis
+    environment:
+      - REDIS_ADDR=redis:6379
